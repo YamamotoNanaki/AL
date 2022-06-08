@@ -41,6 +41,7 @@ void IF::Scene::Initialize()
 	}
 	light->SetCircleShadowActive(0, true);
 	light->SetCircleShadowActive(1, true);
+	light->SetCircleShadowActive(2, false);
 	light->SetAmbientColor({ 1, 1, 1 });
 	Object::SetLight(light);
 	//定数バッファの初期化
@@ -67,27 +68,12 @@ void IF::Scene::Initialize()
 
 	sphereM.LoadModel("sphere", true);
 	sphereO.Initialize(device, &sphereM);
+	cube.LoadModel("cube", true);
 
 	sphereO.position = { -1,0,0 };
 	sphereO.scale = { 0.5,0.5,0.5 };
 	matView.Update();
-
-	cube.LoadModel("cube", true);
-	for (int i = 0; i < _countof(cubes); i++)
-	{
-		cubes[i].Initialize(device, &cube);
-		if (i > 0)
-		{
-			cubes[i].parent = &cubes[i - 1];
-			cubes[i].scale = { 0.7f,0.7f,0.7f };
-			cubes[i].rotation = { 0.0f,0.0f,XMConvertToRadians(30.0f) };
-			cubes[i].position = { 0.0f,0.0f,-1 };
-		}
-		else cubes[i].position.y = 1;
-
-		cubes[i].Update(matView.Get(), matPro->Get(), matView.eye);
-	}
-
+	player.Initialize(&cube, matView.Get(), matPro->Get(), matView.eye, device);
 
 	//2D関連
 	sprite.StaticInitialize(device, commandList, (float)winWidth, (float)winHeight);
@@ -111,13 +97,26 @@ void IF::Scene::Update()
 	//光源
 	static XMFLOAT3 dlColor = { 1,1,1 };
 
-	if (input->Judge(KEY::WASD, KEY::OR))
+	const static float cameraR = 20.0f;
+	static float rota = -90.0f;
+
+	if (input->Judge(KEY::Arrow, KEY::OR))
 	{
-		if (input->KDown(KEY::S))matView.eye.z += 0.3f, matView.target.z += 0.3f;
-		if (input->KDown(KEY::W))matView.eye.z -= 0.3f, matView.target.z -= 0.3f;
-		if (input->KDown(KEY::D))matView.eye.x -= 0.3f, matView.target.x -= 0.3f;
-		if (input->KDown(KEY::A))matView.eye.x += 0.3f, matView.target.x += 0.3f;
+		if (input->KDown(KEY::DOWN))matView.eye.z += 0.3f;
+		if (input->KDown(KEY::UP))matView.eye.z -= 0.3f;
+		if (input->KDown(KEY::RIGHT))matView.eye.x -= 0.3f;
+		if (input->KDown(KEY::LEFT))matView.eye.x += 0.3f;
 	}
+	if (input->KDown(KEY::Z))rota++;
+	if (input->KDown(KEY::C))rota--;
+	if (rota < 0)rota += 360;
+	if (rota > 360)rota -= 360;
+
+	float rotaR = ConvertToRadians(rota);
+
+	matView.target.x = matView.eye.x + cameraR * cosf(rotaR);
+	matView.target.z = matView.eye.z + cameraR * sinf(rotaR);
+
 	matView.Update();
 
 	//if (input->KDown(KEY::W))lightDir.m128_f32[1] += 1.0f;
@@ -134,38 +133,6 @@ void IF::Scene::Update()
 
 	for (int i = 0; i < 3; i++)light->SetDirLightColor(i, dlColor);
 
-	XMFLOAT3 front = { 0,0,0 };
-	XMFLOAT3 move = { 0,0,0 };
-	float rota = 0;
-
-	const float kCharacterSpeed = 0.2f;
-	const float kRotaSpeed = 0.01;
-
-	if (input->KDown(KEY::RIGHT))
-	{
-		rota += kRotaSpeed;
-	}
-	if (input->KDown(KEY::LEFT))
-	{
-		rota -= kRotaSpeed;
-	}
-	cubes[0].rotation.y += rota;
-
-	front = { sinf(cubes[0].rotation.y),0, cosf(cubes[0].rotation.y) };
-
-
-	if (input->KDown(KEY::UP))
-	{
-		move = { front.x * -kCharacterSpeed, 0, front.z * -kCharacterSpeed };
-	}
-	if (input->KDown(KEY::DOWN))
-	{
-		move = { front.x * kCharacterSpeed, 0, front.z * kCharacterSpeed };
-	}
-
-	cubes[0].position.x += move.x;
-	cubes[0].position.y += move.y;
-	cubes[0].position.z += move.z;
 
 	//matView.target = cubes[0].position;
 	//matView.eye.x = cubes[0].position.x + front.x * 20;
@@ -173,17 +140,13 @@ void IF::Scene::Update()
 
 	//matView.Update();
 
-	for (int i = 0; i < _countof(cubes); i++)
-	{
-		cubes[i].Update(matView.Get(), matPro->Get(), matView.eye);
-	}
-
-
 	domeObj.Update(matView.Get(), matPro->Get(), matView.eye);
 	groundObj.Update(matView.Get(), matPro->Get(), matView.eye);
 	sphereO.Update(matView.Get(), matPro->Get(), matView.eye);
 
-	light->SetCircleShadowCasterPos(0, cubes[0].position);
+	player.Update(matView.Get(), matPro->Get(), matView.eye, matView.target);
+
+	light->SetCircleShadowCasterPos(0, player.GetPos());
 	light->SetCircleShadowCasterPos(1, sphereO.position);
 
 	light->Update();
@@ -193,6 +156,7 @@ void IF::Scene::Update()
 
 	//デバッグ用
 #ifdef _DEBUG
+	static XMFLOAT3 front = player.GetFront();
 	dText.Print(50, 50, 1.5, "front(x:%f,y:%f,z:%f)", front.x, front.y, front.z);
 
 #endif // _DEBUG
@@ -208,7 +172,7 @@ void IF::Scene::Draw()
 
 	sphereO.Draw(commandList, viewport);
 
-	for (int i = 0; i < _countof(cubes); i++)cubes[i].Draw(commandList, viewport);
+	player.Draw(commandList, viewport);
 
 	graph.DrawBlendMode(commandList, Blend::NORMAL2D);
 	sprite.DrawBefore(graph.rootsignature.Get(), cb.GetGPUAddress());

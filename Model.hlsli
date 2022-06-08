@@ -49,7 +49,7 @@ struct SLight
 	uint active;
 };
 
-static const int CSHADOW_NUM = 1;
+static const int CSHADOW_NUM = 3;
 
 struct CShadow
 {

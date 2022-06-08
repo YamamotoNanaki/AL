@@ -170,7 +170,9 @@
     <ClCompile Include="Float2.cpp" />
     <ClCompile Include="Float3.cpp" />
     <ClCompile Include="Float4.cpp" />
-    <ClCompile Include="FPS.cpp" />
+    <ClCompile Include="FPS.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MinSpace</Optimization>
+    </ClCompile>
     <ClCompile Include="GPipeline.cpp" />
     <ClCompile Include="Graphic.cpp" />
     <ClCompile Include="IFMath.cpp" />
@@ -181,6 +183,7 @@
     <ClCompile Include="ModelVI.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleVI.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Projection.cpp" />
     <ClCompile Include="Rand.cpp" />
     <ClCompile Include="RootParam.cpp" />
@@ -302,6 +305,7 @@
     <ClInclude Include="ModelVI.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleVI.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="Projection.h" />
     <ClInclude Include="RootParam.h" />

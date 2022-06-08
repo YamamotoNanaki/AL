@@ -21,7 +21,7 @@ namespace IF
 		static const int PLightNum = 3;
 		static const int DLightNum = 3;
 		static const int SLightNum = 3;
-		static const int CShadowNum = 2;
+		static const int CShadowNum = 3;
 
 	public:
 		struct ConstBufferData

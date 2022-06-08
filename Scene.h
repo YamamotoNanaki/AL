@@ -11,6 +11,7 @@
 #include "Sprite.h"
 #include "IScene.h"
 #include "Sound.h"
+#include "Player.h"
 
 #ifdef _DEBUG
 #include "DebugText.h"
@@ -47,7 +48,7 @@ namespace IF
 		unsigned int SGraph = 0;
 		unsigned int testSound = 0;
 		Model cube{};
-		Object cubes[5]{};
+		Player player;
 
 		//-----------------------
 
