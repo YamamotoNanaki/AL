@@ -18,5 +18,6 @@ namespace IF
 	public:
 		void Initialize(unsigned int fps);
 		void FPSFixed();
+		FPS(unsigned int fps);
 	};
 }

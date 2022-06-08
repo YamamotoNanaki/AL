@@ -12,11 +12,7 @@
 #include "IScene.h"
 #include "Sound.h"
 #include "Player.h"
-
-#ifdef _DEBUG
 #include "DebugText.h"
-
-#endif // _DEBUG
 
 
 namespace IF
@@ -82,7 +78,7 @@ namespace IF
 		DebugText dText;
 
 #endif // _DEBUG
-
+		DebugText text;
 
 	public:
 		Scene(int winWidth, int winHeight, ID3D12Device* device, ID3D12GraphicsCommandList* commandList, vector<D3D12_VIEWPORT> viewport);

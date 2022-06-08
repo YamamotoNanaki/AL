@@ -82,6 +82,7 @@ void IF::Scene::Initialize()
 
 	sound->SoundPlay(testSound);
 
+	text.Initialize(tex->LoadTexture("Resources/debugfont.png"));
 	//デバッグ用
 #ifdef _DEBUG
 	dText.Initialize(tex->LoadTexture("Resources/debugfont.png"));
@@ -154,6 +155,11 @@ void IF::Scene::Update()
 	sprite.position = { 540,500 };
 	sprite.Update();
 
+	text.Print(50, 150, 1.5, "move       : WASD");
+	text.Print(50, 175, 1.5, "switch     : Q");
+	text.Print(50, 200, 1.5, "cameramove : WASD");
+	text.Print(50, 225, 1.5, "camerarota : ZC");
+
 	//デバッグ用
 #ifdef _DEBUG
 	static XMFLOAT3 front = player.GetFront();
@@ -177,6 +183,7 @@ void IF::Scene::Draw()
 	graph.DrawBlendMode(commandList, Blend::NORMAL2D);
 	sprite.DrawBefore(graph.rootsignature.Get(), cb.GetGPUAddress());
 	//sprite.Draw(viewport);
+	text.Draw(viewport);
 
 	//デバッグ用
 #ifdef _DEBUG

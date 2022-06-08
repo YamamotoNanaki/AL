@@ -33,3 +33,8 @@ void FPS::FPSFixed() {
 	timeStart = timeEnd; // “ü‚ê‘Ö‚¦
 }
 
+IF::FPS::FPS(unsigned int fps)
+{
+	Initialize(fps);
+}
+

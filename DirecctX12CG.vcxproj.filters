@@ -210,9 +210,6 @@
     <ClCompile Include="MathConvert.cpp">
       <Filter>ソース ファイル\Engine\Math</Filter>
     </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>ソース ファイル\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="FPS.cpp">
       <Filter>ソース ファイル\Engine\Base</Filter>
     </ClCompile>
@@ -226,6 +223,9 @@
       <Filter>ソース ファイル\Engine\Debug</Filter>
     </ClCompile>
     <ClCompile Include="Player.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

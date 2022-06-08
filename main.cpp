@@ -28,8 +28,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		DirectX12::Instance()->commandList.Get(), DirectX12::Instance()->viewport);
 	DirectX12::Instance()->SetClearColor(0, 0, 0);
 	scene->Initialize();
-	FPS fps;
-	fps.Initialize(60);
+	FPS fps(60);
 
 	while (!Input::getInstance()->KDown(KEY::ESC))
 	{
