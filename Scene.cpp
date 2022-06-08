@@ -157,7 +157,7 @@ void IF::Scene::Update()
 
 	text.Print(50, 150, 1.5, "move       : WASD");
 	text.Print(50, 175, 1.5, "switch     : Q");
-	text.Print(50, 200, 1.5, "cameramove : WASD");
+	text.Print(50, 200, 1.5, "cameramove : Arrow");
 	text.Print(50, 225, 1.5, "camerarota : ZC");
 
 	//デバッグ用
