@@ -50,8 +50,10 @@ namespace IF
 	public:
 		static void SetDevice(ID3D12Device* device);
 		void LoadModel(std::string name, bool smoothing = false);
-		void VIInitialize(bool smoothing);
+		void CreateCube(bool smoothing = false);
+		void VIInitialize(bool smoothing, bool normal = false);
 		void Draw(ID3D12GraphicsCommandList* commandList, vector<D3D12_VIEWPORT> viewport, ID3D12Resource* address);
+		void Draw(ID3D12GraphicsCommandList* commandList, vector<D3D12_VIEWPORT> viewport, ID3D12Resource* address, unsigned short texNum);
 		~Model();
 	};
 }

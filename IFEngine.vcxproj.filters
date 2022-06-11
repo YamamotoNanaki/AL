@@ -228,6 +228,9 @@
     <ClInclude Include="Engine\Base\Debug.h">
       <Filter>Header Files\Engine\Base</Filter>
     </ClInclude>
+    <ClInclude Include="Scene\Scene2.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\2d\DebugText.cpp">
@@ -340,6 +343,9 @@
     </ClCompile>
     <ClCompile Include="Engine\Base\Debug.cpp">
       <Filter>Source Files\Engine\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Scene2.cpp">
+      <Filter>Source Files\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

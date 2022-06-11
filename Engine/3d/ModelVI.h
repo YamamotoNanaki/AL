@@ -13,11 +13,6 @@ namespace IF
 		DirectX::XMFLOAT3 normal;		//法線ベクトル
 		DirectX::XMFLOAT2 uv;			//UV座標
 	};
-	enum NormalFlag
-	{
-		NFALSE = false,
-		NTRUE = true
-	};
 	class MVI
 	{
 	private:
@@ -33,7 +28,8 @@ namespace IF
 
 	public:
 		void SetVerticleIndex(std::vector<Vertex> vertices, size_t vertexCount, std::vector<unsigned short> indices, size_t indexCount);
-		void Initialize(ID3D12Device* device, bool smoothing, NormalFlag flag = NFALSE);
+		void SetVerticleIndex(Vertex* vertices, size_t vertexCount, unsigned short* indices, size_t indexCount);
+		void Initialize(ID3D12Device* device, bool smoothing, bool flag = false);
 		D3D12_VERTEX_BUFFER_VIEW& GetVertexView();
 		D3D12_INDEX_BUFFER_VIEW& GetIndexView();
 		size_t GetSize();

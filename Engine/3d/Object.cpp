@@ -95,6 +95,19 @@ void Object::Draw(ID3D12GraphicsCommandList* commandList, vector<D3D12_VIEWPORT>
 	model->Draw(commandList, viewport, constBuffTransform.Get());
 }
 
+void IF::Object::Draw(ID3D12GraphicsCommandList* commandList, vector<D3D12_VIEWPORT> viewport, unsigned short texNum)
+{
+	if (model == nullptr)
+	{
+		assert(0 && "モデルがセットされていません");
+		return;
+	}
+
+	light->Draw(commandList, 4);
+
+	model->Draw(commandList, viewport, constBuffTransform.Get(), texNum);
+}
+
 Object::~Object()
 {
 	constBuffTransform->Unmap(0, nullptr);

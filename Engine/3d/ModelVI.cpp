@@ -15,7 +15,19 @@ void IF::MVI::SetVerticleIndex(std::vector<Vertex> vertices, size_t vertexCount,
 	}
 }
 
-void IF::MVI::Initialize(ID3D12Device* device, bool smoothing, NormalFlag flag)
+void IF::MVI::SetVerticleIndex(Vertex* vertices, size_t vertexCount, unsigned short* indices, size_t indexCount)
+{
+	for (int i = 0; i < vertexCount; i++)
+	{
+		this->vertices.push_back(vertices[i]);
+	}
+	for (int i = 0; i < indexCount; i++)
+	{
+		this->indices.push_back(indices[i]);
+	}
+}
+
+void IF::MVI::Initialize(ID3D12Device* device, bool smoothing, bool flag)
 {
 	HRESULT result;
 
@@ -49,7 +61,7 @@ void IF::MVI::Initialize(ID3D12Device* device, bool smoothing, NormalFlag flag)
 		}
 	}
 
-	if (!indices.size() == 0 && flag == NTRUE)
+	if (!indices.size() == 0 && flag && !smoothing)
 	{
 		for (int i = 0; i < indices.size() / 3; i++)
 		{

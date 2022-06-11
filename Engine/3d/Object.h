@@ -54,6 +54,7 @@ namespace IF
 			D3D_PRIMITIVE_TOPOLOGY topology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		void Update(XMMATRIX matView, XMMATRIX matProjection, XMFLOAT3 comeraPos, BillBoard::BillBoardMode mode = BillBoard::NOON);
 		void Draw(ID3D12GraphicsCommandList* commandList, vector<D3D12_VIEWPORT> viewport);
+		void Draw(ID3D12GraphicsCommandList* commandList, vector<D3D12_VIEWPORT> viewport, unsigned short texNum);
 		~Object();
 		static void SetLight(LightManager* light)
 		{

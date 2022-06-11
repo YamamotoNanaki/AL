@@ -1,7 +1,7 @@
 #include "Window.h"
 #include "DirectX12.h"
 #include "Input.h"
-#include "Scene.h"
+#include "Scene2.h"
 #include "FPS.h"
 #ifdef _DEBUG
 #include "Debug.h"
@@ -22,7 +22,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	Input::Instance()->Initialize(Window::Instance()->w.hInstance, Window::Instance()->hwnd);
 	LightManager::Instance()->SetDevice(DirectX12::Instance()->device.Get());
 	Sound::Instance()->Initialize();
-	IScene* scene = new Scene(winWidth, winHeight, DirectX12::Instance()->device.Get(), DirectX12::Instance()->commandList.Get(), DirectX12::Instance()->viewport);
+	IScene* scene = new Scene2(winWidth, winHeight, DirectX12::Instance()->device.Get(), DirectX12::Instance()->commandList.Get(), DirectX12::Instance()->viewport);
 	scene->Initialize();
 	FPS fps;
 	fps.Initialize(60);

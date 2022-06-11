@@ -212,6 +212,7 @@
     <ClInclude Include="Engine\Sound\Sound.h" />
     <ClInclude Include="Scene\IScene.h" />
     <ClInclude Include="Scene\Scene.h" />
+    <ClInclude Include="Scene\Scene2.h" />
     <ClInclude Include="Source\Fire.h" />
   </ItemGroup>
   <ItemGroup>
@@ -254,6 +255,7 @@
     <ClCompile Include="Engine\Sound\Sound.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Scene\Scene.cpp" />
+    <ClCompile Include="Scene\Scene2.cpp" />
     <ClCompile Include="Source\Fire.cpp" />
   </ItemGroup>
   <ItemGroup>

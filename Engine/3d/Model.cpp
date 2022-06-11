@@ -195,9 +195,104 @@ void Model::LoadModel(string name, bool smoothing)
 	VIInitialize(smoothing);
 }
 
-void Model::VIInitialize(bool smoothing)
+void IF::Model::CreateCube(bool smoothing)
 {
-	vi->Initialize(device.Get(), smoothing);
+	vi = new MVI;
+
+	Vertex vertices[] = {
+		// x   y   z        u    v
+		//前
+		{{-5, -5, -5},{},{0.0f, 1.0f}},	//左下
+		{{-5, +5, -5},{},{0.0f, 0.0f}},	//左上
+		{{+5, -5, -5},{},{1.0f, 1.0f}},	//右下
+		{{+5, +5, -5},{},{1.0f, 0.0f}},	//右上
+		//後			
+		{{+5, -5, +5},{},{1.0f, 1.0f}},	//右下
+		{{+5, +5, +5},{},{1.0f, 0.0f}},	//右上
+		{{-5, -5, +5},{},{0.0f, 1.0f}},	//左下
+		{{-5, +5, +5},{},{0.0f, 0.0f}},	//左上
+		//左			
+		{{-5, -5, -5},{},{0.0f, 1.0f}},	//左下
+		{{-5, -5, +5},{},{0.0f, 0.0f}},	//左上
+		{{-5, +5, -5},{},{1.0f, 1.0f}},	//右下
+		{{-5, +5, +5},{},{1.0f, 0.0f}},	//右上
+		//右			
+		{{+5, +5, -5},{},{1.0f, 1.0f}},	//右下
+		{{+5, +5, +5},{},{1.0f, 0.0f}},	//右上
+		{{+5, -5, -5},{},{0.0f, 1.0f}},	//左下
+		{{+5, -5, +5},{},{0.0f, 0.0f}},	//左上
+		//下			
+		{{-5, +5, +5},{},{1.0f, 1.0f}},	//右下
+		{{+5, +5, +5},{},{1.0f, 0.0f}},	//右上
+		{{-5, +5, -5},{},{0.0f, 1.0f}},	//左下
+		{{+5, +5, -5},{},{0.0f, 0.0f}},	//左上
+		//上			
+		{{-5, -5, -5},{},{0.0f, 1.0f}},	//左下
+		{{+5, -5, -5},{},{0.0f, 0.0f}},	//左上
+		{{-5, -5, +5},{},{1.0f, 1.0f}},	//右下
+		{{+5, -5, +5},{},{1.0f, 0.0f}},	//右上
+	};
+
+	//インデックスデータ
+	unsigned short indices[] = {
+		//前
+		0,1,2,
+		2,1,3,
+		//後
+		4,5,6,
+		6,5,7,
+		//左
+		8,9,10,
+		10,9,11,
+		//右
+		12,13,14,
+		14,13,15,
+		//下
+		16,17,18,
+		18,17,19,
+		//上
+		20,21,22,
+		22,21,23
+	};
+
+	vi->SetVerticleIndex(vertices, _countof(vertices), indices, _countof(indices));
+
+	//定数バッファのヒープ設定
+	D3D12_HEAP_PROPERTIES heapProp{};
+	heapProp.Type = D3D12_HEAP_TYPE_UPLOAD;
+	//定数バッファのリソース設定
+	D3D12_RESOURCE_DESC resdesc{};
+	resdesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	resdesc.Width = (sizeof(ConstBufferDataTransform) + 0xff) & ~0xff;
+	resdesc.Height = 1;
+	resdesc.DepthOrArraySize = 1;
+	resdesc.MipLevels = 1;
+	resdesc.SampleDesc.Count = 1;
+	resdesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	resdesc.Width = (sizeof(ConstBufferMaterial) + 0xff) & ~0xff;
+
+	HRESULT result = device->CreateCommittedResource(
+		&heapProp, D3D12_HEAP_FLAG_NONE, &resdesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
+		IID_PPV_ARGS(&constBuffTransform1));
+	assert(SUCCEEDED(result));
+
+	result = constBuffTransform1->Map(0, nullptr, (void**)&constMapMaterial);
+	assert(SUCCEEDED(result));
+
+	constMapMaterial->ambient = Float3Convert(material.ambient);
+	constMapMaterial->diffuse = Float3Convert(material.diffuse);
+	constMapMaterial->specular = Float3Convert(material.specular);
+	constMapMaterial->alpha = material.alpha;
+
+	constBuffTransform1->Unmap(0, nullptr);
+
+	VIInitialize(smoothing, true);
+}
+
+void Model::VIInitialize(bool smoothing, bool normal)
+{
+	vi->Initialize(device.Get(), smoothing, normal);
 }
 
 void IF::Model::SetDevice(ID3D12Device* device)
@@ -210,6 +305,24 @@ void IF::Model::Draw(ID3D12GraphicsCommandList* commandList, vector<D3D12_VIEWPO
 	for (int i = 0; i < viewport.size(); i++)
 	{
 		if (material.tex == true)Texture::Instance()->setTexture(commandList, material.texNum);
+		commandList->RSSetViewports(1, &viewport[i]);
+		//頂点バッファの設定
+		commandList->IASetVertexBuffers(0, 1, &vi->GetVertexView());
+		//インデックスバッファの設定
+		commandList->IASetIndexBuffer(&vi->GetIndexView());
+		//定数バッファビューの設定
+		commandList->SetGraphicsRootConstantBufferView(2, address->GetGPUVirtualAddress());
+		commandList->SetGraphicsRootConstantBufferView(3, constBuffTransform1->GetGPUVirtualAddress());
+		//描画コマンド
+		commandList->DrawIndexedInstanced((UINT)vi->GetSize(), 1, 0, 0, 0);
+	}
+}
+
+void IF::Model::Draw(ID3D12GraphicsCommandList* commandList, vector<D3D12_VIEWPORT> viewport, ID3D12Resource* address, unsigned short texNum)
+{
+	for (int i = 0; i < viewport.size(); i++)
+	{
+		Texture::Instance()->setTexture(commandList, texNum);
 		commandList->RSSetViewports(1, &viewport[i]);
 		//頂点バッファの設定
 		commandList->IASetVertexBuffers(0, 1, &vi->GetVertexView());
