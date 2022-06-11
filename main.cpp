@@ -22,7 +22,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	Input::Instance()->Initialize(Window::Instance()->w.hInstance, Window::Instance()->hwnd);
 	LightManager::Instance()->SetDevice(DirectX12::Instance()->device.Get());
 	Sound::Instance()->Initialize();
-	IScene* scene = new Scene(winWidth, winHeight, DirectX12::Instance()->device.Get(),DirectX12::Instance()->commandList.Get(), DirectX12::Instance()->viewport);
+	IScene* scene = new Scene(winWidth, winHeight, DirectX12::Instance()->device.Get(), DirectX12::Instance()->commandList.Get(), DirectX12::Instance()->viewport);
 	scene->Initialize();
 	FPS fps;
 	fps.Initialize(60);
@@ -44,16 +44,20 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	Input::DeleteInstance();
 	Sound::DeleteInstance();
 	Texture::DeleteInstance();
-	ID3D12Device* device = DirectX12::Instance()->device.Get();
+#ifdef _DEBUG
+	Microsoft::WRL::ComPtr<ID3D12Device> device = DirectX12::Instance()->device.Get();
+#endif // _DEBUG
+
 	DirectX12::DeleteInstance();
 	Window::DeleteInstance();
 
-	ID3D12DebugDevice* debugInterface;
-
-	if (SUCCEEDED(device->QueryInterface(&debugInterface)))
+#ifdef _DEBUG
+	Microsoft::WRL::ComPtr < ID3D12DebugDevice> debugInterface;
+	if (SUCCEEDED(device->QueryInterface(debugInterface.GetAddressOf())))
 	{
 		debugInterface->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL | D3D12_RLDO_IGNORE_INTERNAL);
 		debugInterface->Release();
 	}
+#endif // _DEBUG
 	return 0;
 }
