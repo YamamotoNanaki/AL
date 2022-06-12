@@ -13,7 +13,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	const int winWidth = 1280;  // 横幅
 	const int winHeight = 720;  // 縦幅
 
-	Window::Instance()->Initialize(winWidth, winHeight);
+	Window::Instance()->Initialize(winWidth, winHeight, L"LE2A_24_ヤマモト_ナナキ_AL3");
 #ifdef _DEBUG
 	Debug();
 #endif // _DEBUG
