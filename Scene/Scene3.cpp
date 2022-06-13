@@ -91,25 +91,25 @@ void IF::Scene3::Update()
 	//ƒJƒƒ‰
 	if (input->KDown(KEY::UP))
 	{
-		matView.eye.z += 0.5f;
-		matView.target.z += 0.5f;
+		matView.eye.z += 2;
+		//matView.target.z += 0.5f;
 	}
 	if (input->KDown(KEY::DOWN))
 	{
-		matView.eye.z -= 0.5f;
-		matView.target.z -= 0.5f;
+		matView.eye.z -= 2;
+		//matView.target.z -= 0.5f;
 	}
 	if (input->KDown(KEY::RIGHT))
 	{
-		matView.eye.x += 0.5f;
-		matView.target.x += 0.5f;
+		//matView.eye.x += 0.5f;
+		matView.target.x += 2;
 	}
 	if (input->KDown(KEY::LEFT))
 	{
-		matView.eye.x -= 0.5f;
-		matView.target.x -= 0.5f;
+		//matView.eye.x -= 0.5f;
+		matView.target.x -= 2;
 	}
-	static int rota = 0;
+	static int rota = 90;
 	if (input->KDown(KEY::SPACE))rota++;
 	if (rota >= 360)rota = 0;
 	matView.up = { cosf(ConvertToRadians(rota)),sinf(ConvertToRadians(rota)),0 };
