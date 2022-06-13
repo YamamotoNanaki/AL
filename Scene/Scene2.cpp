@@ -109,6 +109,10 @@ void IF::Scene2::Update()
 	static float posx = 0;
 	static float posz = 0;
 	rota++;
+	if (rota >= 360)
+	{
+		rota -= 360;
+	}
 	posx = cosf(ConvertToRadians(rota)) * 300;
 	posz = sinf(ConvertToRadians(rota)) * 300;
 
