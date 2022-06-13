@@ -125,6 +125,10 @@ void IF::Scene2::Update()
 
 	sprite.position = { 540,500 };
 	sprite.Update();
+
+	dText.Print(50, 50, 1.5, "eye    : %f,%f,%f", matView.eye.x, matView.eye.y, matView.eye.z);
+	dText.Print(50, 75, 1.5, "target : %f,%f,%f", matView.target.x, matView.target.y, matView.target.z);
+	dText.Print(50, 100, 1.5, "up     : %f,%f,%f", matView.up.x, matView.up.y, matView.up.z);
 }
 
 void IF::Scene2::Draw()
@@ -132,4 +136,7 @@ void IF::Scene2::Draw()
 	graph->DrawBlendMode(commandList.Get());
 	obj.DrawBefore(commandList.Get(), graph->rootsignature.Get(), cb.GetGPUAddress());
 	obj.Draw(commandList.Get(), viewport, texNum);
+	graph->DrawBlendMode(commandList.Get(), Blend::NORMAL2D);
+	sprite.DrawBefore(graph->rootsignature.Get(), cb.GetGPUAddress());
+	dText.Draw(viewport);
 }
