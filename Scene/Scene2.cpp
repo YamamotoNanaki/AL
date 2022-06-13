@@ -1,5 +1,7 @@
 #include "Scene2.h"
 #include "Input.h"
+#include "Ease.h"
+#include "Timer.h"
 
 using namespace IF;
 using namespace DirectX;
@@ -109,15 +111,31 @@ void IF::Scene2::Update()
 	//	matView.eye.x -= 0.5f;
 	//	matView.target.x -= 0.5f;
 	//}
-	static short flag = 0;
+	static short flagNum = 0;
+	static bool flag = false;
+	static Float3 target{};
+	static Float3 start{};
+	static Timer timer;
 
-	if (input->KTriggere(KEY::SPACE))
+	if (input->KTriggere(KEY::SPACE) && !flag)
 	{
-		flag++;
-		if (flag == 3)flag = 0;
-		if (flag == 0)matView.target = obj[0].position;
-		if (flag == 1)matView.target = obj[1].position;
-		if (flag == 2)matView.target = obj[2].position;
+		start = Float3Convert(matView.target);
+		flag = true;
+		flagNum++;
+		timer.Set(30);
+		if (flagNum == 3)flagNum = 0;
+		if (flagNum == 0)target = Float3Convert(obj[0].position);
+		if (flagNum == 1)target = Float3Convert(obj[1].position);
+		if (flagNum == 2)target = Float3Convert(obj[2].position);
+	}
+
+	if (flag)
+	{
+		timer.Update();
+		matView.target.x = Ease::InOutQuad(start.x, target.x, 30, timer.NowTime());
+		matView.target.y = Ease::InOutQuad(start.y, target.y, 30, timer.NowTime());
+		matView.target.z = Ease::InOutQuad(start.z, target.z, 30, timer.NowTime());
+		if (timer.IsEnd())flag = false;
 	}
 
 	matView.Update();
