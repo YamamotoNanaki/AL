@@ -3,7 +3,7 @@ using namespace DirectX;
 using namespace IF;
 
 Projection::Projection(float radian, float winWidth, float winHeight, float nearZ, float farZ)
-	:radian(radian), winWidth(winWidth), winHeight(winHeight), nearZ(nearZ), farZ(farZ)
+	:fovAngle(radian), winWidth(winWidth), winHeight(winHeight), nearZ(nearZ), farZ(farZ)
 {
 	Inisialize(radian, winWidth, winHeight, nearZ, farZ);
 }
@@ -17,7 +17,7 @@ void Projection::Inisialize(float radian, float winWidth, float winHeight, float
 void IF::Projection::Update()
 {
 	matProjection = XMMatrixPerspectiveFovLH(
-		XMConvertToRadians(radian), (float)winWidth / winHeight, nearZ, farZ);
+		XMConvertToRadians(fovAngle), (float)winWidth / winHeight, nearZ, farZ);
 }
 
 XMMATRIX Projection::Get() const

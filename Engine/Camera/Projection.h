@@ -11,7 +11,7 @@ namespace IF
 	public:
 		float nearZ, farZ;
 		float winWidth, winHeight;
-		float radian;
+		float fovAngle;
 
 	public:
 		Projection(float radian, float winWidth, float winHeight, float nearZ = 0.1f, float farZ = 1000.0f);

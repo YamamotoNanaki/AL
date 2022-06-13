@@ -89,31 +89,35 @@ void IF::Scene3::Update()
 	for (int i = 0; i < 3; i++)light->SetDirLightColor(i, dlColor);
 
 	//ƒJƒƒ‰
-	if (input->KDown(KEY::UP))
+	if (input->KDown(KEY::W))
 	{
-		matView.eye.z += 2;
-		//matView.target.z += 0.5f;
+		//matView.eye.z += 2;
+		matView.target.y += 2;
 	}
-	if (input->KDown(KEY::DOWN))
+	if (input->KDown(KEY::S))
 	{
-		matView.eye.z -= 2;
-		//matView.target.z -= 0.5f;
+		//matView.eye.z -= 2;
+		matView.target.y -= 2;
 	}
-	if (input->KDown(KEY::RIGHT))
+	if (input->KDown(KEY::A))
 	{
-		//matView.eye.x += 0.5f;
-		matView.target.x += 2;
-	}
-	if (input->KDown(KEY::LEFT))
-	{
-		//matView.eye.x -= 0.5f;
+		//matView.eye.x += 2;
 		matView.target.x -= 2;
 	}
-	static int rota = 90;
-	if (input->KDown(KEY::SPACE))rota++;
-	if (rota >= 360)rota = 0;
-	matView.up = { cosf(ConvertToRadians(rota)),sinf(ConvertToRadians(rota)),0 };
-
+	if (input->KDown(KEY::D))
+	{
+		//matView.eye.x -= 2;
+		matView.target.x += 2;
+	}
+	static float zoom = 45.0f;
+	if (input->KDown(KEY::UP))zoom++;
+	if (input->KDown(KEY::DOWN))zoom--;
+	matPro->fovAngle = zoom;
+	//static int rota = 90;
+	//if (input->KDown(KEY::SPACE))rota++;
+	//if (rota >= 360)rota = 0;
+	//matView.up = { cosf(ConvertToRadians(rota)),sinf(ConvertToRadians(rota)),0 };
+	matPro->Update();
 	matView.Update();
 	light->Update();
 	for (int i = 0; i < _countof(obj); i++)
@@ -123,9 +127,10 @@ void IF::Scene3::Update()
 	sprite.position = { 540,500 };
 	sprite.Update();
 
-	dText.Print(50, 50, 1.5, "eye    : %f,%f,%f", matView.eye.x, matView.eye.y, matView.eye.z);
-	dText.Print(50, 75, 1.5, "target : %f,%f,%f", matView.target.x, matView.target.y, matView.target.z);
-	dText.Print(50, 100, 1.5, "up     : %f,%f,%f", matView.up.x, matView.up.y, matView.up.z);
+	dText.Print(50, 50, 1.5, "eye      : %f,%f,%f", matView.eye.x, matView.eye.y, matView.eye.z);
+	dText.Print(50, 75, 1.5, "target   : %f,%f,%f", matView.target.x, matView.target.y, matView.target.z);
+	dText.Print(50, 100, 1.5, "up      : %f,%f,%f", matView.up.x, matView.up.y, matView.up.z);
+	dText.Print(50, 125, 1.5, "fovAngle: %f", zoom);
 }
 
 void IF::Scene3::Draw()
