@@ -15,13 +15,13 @@
 
 namespace IF
 {
-	class Scene2 : public IScene
+	class Scene3 : public IScene
 	{
 		template <class T>using vector = std::vector<T>;
 		template <class T>using ComPtr = Microsoft::WRL::ComPtr<T>;
 	private:
 		//ïœêî----------------------//
-		Object obj;
+		Object obj[100];
 		Model cube;
 		DirectX::XMFLOAT3 csDir{ 0.0f,-1.0f,0.0f };
 		DirectX::XMFLOAT3 csAtten{ 0.5f,0.6f,0.0f };
@@ -54,8 +54,8 @@ namespace IF
 		vector<D3D12_VIEWPORT> viewport;
 
 	public:
-		Scene2(int winWidth, int winHeight, ID3D12Device* device, ID3D12GraphicsCommandList* commandList, vector<D3D12_VIEWPORT> viewport);
-		~Scene2();
+		Scene3(int winWidth, int winHeight, ID3D12Device* device, ID3D12GraphicsCommandList* commandList, vector<D3D12_VIEWPORT> viewport);
+		~Scene3();
 
 		void Initialize();
 		void Update();

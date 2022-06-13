@@ -63,7 +63,7 @@ void IF::Scene::Initialize()
 	matView.eye = { 1,1,-5.0f };
 
 	//‚»‚Ì‚Ù‚©‚Ì‰Šú‰»
-	Rand::Initialize();
+	Rand random;
 
 	sphereM.LoadModel("sphere", true);
 	sphereO.Initialize(device.Get(), &sphereM);

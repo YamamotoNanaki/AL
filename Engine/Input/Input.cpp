@@ -46,7 +46,7 @@ void IF::Input::Initialize(HINSTANCE& hInstance, HWND& hwnd)
 
 	//排他制御レベルのセット
 	result = keyboard->SetCooperativeLevel(
-		hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+		hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
 	assert(SUCCEEDED(result));
 }
 
