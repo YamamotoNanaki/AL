@@ -44,10 +44,15 @@ void IF::Scene2::Initialize()
 	tex->Initialize();
 	texNum = tex->LoadTexture("Resources/mario.jpg");
 	cube.CreateCube();
-	obj.Initialize(device.Get(), &cube);
-	obj.position = { 0, 1, 0 };
-	obj.scale = { 5, 5, 5 };
-	obj.rotation = { 0,0,0 };
+	for (int i = 0; i < _countof(obj); i++)
+	{
+		obj[i].Initialize(device.Get(), &cube);
+		obj[i].scale = { 3, 3, 3 };
+		obj[i].rotation = { 0,0,0 };
+	}
+	obj[0].position = { 0, 50, 0 };
+	obj[1].position = { 50, -50, 0 };
+	obj[2].position = { -50, -50, 0 };
 
 	//ƒJƒƒ‰ŠÖ˜A‰Šú‰»
 	matPro = new Projection(45.0f, (float)winWidth, (float)winHeight);
@@ -104,24 +109,21 @@ void IF::Scene2::Update()
 	//	matView.eye.x -= 0.5f;
 	//	matView.target.x -= 0.5f;
 	//}
+	static short flag = 0;
 
-	static int rota = 0;
-	static float posx = 0;
-	static float posz = 0;
-	rota++;
-	if (rota >= 360)
+	if (input->KTriggere(KEY::SPACE))
 	{
-		rota -= 360;
+		flag++;
+		if (flag == 3)flag = 0;
+		if (flag == 0)matView.target = obj[0].position;
+		if (flag == 1)matView.target = obj[1].position;
+		if (flag == 2)matView.target = obj[2].position;
 	}
-	posx = cosf(ConvertToRadians(rota)) * 300;
-	posz = sinf(ConvertToRadians(rota)) * 300;
-
-	matView.eye = { posx,1,posz };
 
 	matView.Update();
 	light->Update();
-
-	obj.Update(matView.Get(), matPro->Get(), matView.eye);
+	for (int i = 0; i < _countof(obj); i++)
+		obj[i].Update(matView.Get(), matPro->Get(), matView.eye);
 
 	sprite.position = { 540,500 };
 	sprite.Update();
@@ -134,8 +136,11 @@ void IF::Scene2::Update()
 void IF::Scene2::Draw()
 {
 	graph->DrawBlendMode(commandList.Get());
-	obj.DrawBefore(commandList.Get(), graph->rootsignature.Get(), cb.GetGPUAddress());
-	obj.Draw(commandList.Get(), viewport, texNum);
+	for (int i = 0; i < _countof(obj); i++)
+	{
+		obj[i].DrawBefore(commandList.Get(), graph->rootsignature.Get(), cb.GetGPUAddress());
+		obj[i].Draw(commandList.Get(), viewport, texNum);
+	}
 	graph->DrawBlendMode(commandList.Get(), Blend::NORMAL2D);
 	sprite.DrawBefore(graph->rootsignature.Get(), cb.GetGPUAddress());
 	dText.Draw(viewport);
