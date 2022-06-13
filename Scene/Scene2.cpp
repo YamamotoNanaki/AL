@@ -45,17 +45,18 @@ void IF::Scene2::Initialize()
 	texNum = tex->LoadTexture("Resources/mario.jpg");
 	cube.CreateCube();
 	obj.Initialize(device.Get(), &cube);
-	obj.position = { 10, 10, 10 };
+	obj.position = { 0, 1, 0 };
 	obj.scale = { 5, 5, 5 };
-	obj.rotation = { 45,45,0 };
+	obj.rotation = { 0,0,0 };
 
 	//カメラ関連初期化
 	matPro = new Projection(45.0f, (float)winWidth, (float)winHeight);
 
 	//そのほかの初期化
 	matView.eye = { 0,0,-300 };
+	matView.target = { 0,1,0 };
 	matView.Update();
-	
+
 
 	//2D関連
 	sprite.StaticInitialize(device.Get(), commandList.Get(), (float)winWidth, (float)winHeight);
@@ -83,27 +84,35 @@ void IF::Scene2::Update()
 	for (int i = 0; i < 3; i++)light->SetDirLightColor(i, dlColor);
 
 	//カメラ
-	if (input->KDown(KEY::UP))
-	{
-		matView.eye.z += 0.5f;
-		matView.target.z += 0.5f;
-	}
-	if (input->KDown(KEY::DOWN))
-	{
-		matView.eye.z -= 0.5f;
-		matView.target.z -= 0.5f;
-	}
-	if (input->KDown(KEY::RIGHT))
-	{
-		matView.eye.x += 0.5f;
-		matView.target.x += 0.5f;
-	}
-	if (input->KDown(KEY::LEFT))
-	{
-		matView.eye.x -= 0.5f;
-		matView.target.x -= 0.5f;
-	}
+	//if (input->KDown(KEY::UP))
+	//{
+	//	matView.eye.z += 0.5f;
+	//	matView.target.z += 0.5f;
+	//}
+	//if (input->KDown(KEY::DOWN))
+	//{
+	//	matView.eye.z -= 0.5f;
+	//	matView.target.z -= 0.5f;
+	//}
+	//if (input->KDown(KEY::RIGHT))
+	//{
+	//	matView.eye.x += 0.5f;
+	//	matView.target.x += 0.5f;
+	//}
+	//if (input->KDown(KEY::LEFT))
+	//{
+	//	matView.eye.x -= 0.5f;
+	//	matView.target.x -= 0.5f;
+	//}
 
+	static int rota = 0;
+	static float posx = 0;
+	static float posz = 0;
+	rota++;
+	posx = cosf(ConvertToRadians(rota)) * 300;
+	posz = sinf(ConvertToRadians(rota)) * 300;
+
+	matView.eye = { posx,1,posz };
 
 	matView.Update();
 	light->Update();
