@@ -21,7 +21,7 @@ namespace IF
 		template <class T>using ComPtr = Microsoft::WRL::ComPtr<T>;
 	private:
 		//ïœêî----------------------//
-		Object obj[7];
+		Object obj[8];
 		Model cube;
 		DirectX::XMFLOAT3 csDir{ 0.0f,-1.0f,0.0f };
 		DirectX::XMFLOAT3 csAtten{ 0.5f,0.6f,0.0f };

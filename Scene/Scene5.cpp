@@ -47,10 +47,10 @@ void IF::Scene5::Initialize()
 	cube.CreateCube();
 
 	//ƒJƒƒ‰ŠÖ˜A‰Šú‰»
-	matPro = new Projection(45.0f, (float)winWidth, (float)winHeight, 280, 320);
+	matPro = new Projection(45.0f, (float)winWidth, (float)winHeight);
 
 	//‚»‚Ì‚Ù‚©‚Ì‰Šú‰»
-	matView.eye = { 0,0,-300 };
+	matView.eye = { 0,0,-100 };
 	matView.Update();
 
 
@@ -63,11 +63,24 @@ void IF::Scene5::Initialize()
 	for (int i = 0; i < _countof(obj); i++)
 	{
 		obj[i].Initialize(device.Get(), &cube);
-		obj[i].scale = { 2, 2, 2 };
+		obj[i].scale = { 1, 1, 1 };
 	}
+	obj[0].position = { 0,10,0 };
 
-	obj[1].parent = &obj[0];
-	obj[1].position = { 0,5,0 };
+	obj[1].parent = &obj[7];
+	obj[1].position = { 0,15,0 };
+	obj[2].parent = &obj[7];
+	obj[2].position = { 15,0,0 };
+	obj[3].parent = &obj[7];
+	obj[3].position = { -15,0,0 };
+	obj[4].parent = &obj[0];
+	obj[4].position = { 0,-15,0 };
+	obj[5].parent = &obj[4];
+	obj[5].position = { 15,-15,0 };
+	obj[6].parent = &obj[4];
+	obj[6].position = { -15,-15,0 };
+	obj[7].parent = &obj[0];
+	obj[7].position = { 0,0,0 };
 }
 
 void IF::Scene5::Update()
@@ -89,12 +102,28 @@ void IF::Scene5::Update()
 
 	for (int i = 0; i < 3; i++)light->SetDirLightColor(i, dlColor);
 
-	if (input->KDown(KEY::UP))matPro->nearZ++;
-	if (input->KDown(KEY::DOWN))matPro->nearZ--;
-	if (input->KDown(KEY::RIGHT))matPro->farZ++;
-	if (input->KDown(KEY::LEFT))matPro->farZ--;
+	//if (input->KDown(KEY::UP))matPro->nearZ++;
+	//if (input->KDown(KEY::DOWN))matPro->nearZ--;
+	//if (input->KDown(KEY::RIGHT))matPro->farZ++;
+	//if (input->KDown(KEY::LEFT))matPro->farZ--;
 
 	matPro->Update();
+
+
+	if (input->KDown(KEY::W))obj[0].position.y += 2;
+	if (input->KDown(KEY::S))obj[0].position.y -= 2;
+	if (input->KDown(KEY::D))obj[0].position.x += 2;
+	if (input->KDown(KEY::A))obj[0].position.x -= 2;
+
+	static float rota = 0;
+	if (input->KDown(KEY::U))rota -= 2;
+	if (input->KDown(KEY::I))rota += 2;
+	static float rota2 = 0;
+	if (input->KDown(KEY::J))rota2 -= 2;
+	if (input->KDown(KEY::K))rota2 += 2;
+
+	obj[7].rotation = { 0,ConvertToRadians(rota),0 };
+	obj[4].rotation = { 0,ConvertToRadians(rota2),0 };
 
 	//ƒJƒƒ‰
 	//if (input->KDown(KEY::UP))
@@ -117,10 +146,9 @@ void IF::Scene5::Update()
 	//	//matView.eye.x -= 0.5f;
 	//	matView.target.x -= 2;
 	//}
-	static int rota = 90;
-	if (input->KDown(KEY::SPACE))rota++;
-	if (rota >= 360)rota = 0;
-	matView.up = { cosf(ConvertToRadians(rota)),sinf(ConvertToRadians(rota)),0 };
+	//if (input->KDown(KEY::SPACE))rota++;
+	//if (rota >= 360)rota = 0;
+	//matView.up = { cosf(ConvertToRadians(rota)),sinf(ConvertToRadians(rota)),0 };
 
 	matView.Update();
 	light->Update();
@@ -131,15 +159,15 @@ void IF::Scene5::Update()
 	sprite.position = { 540,500 };
 	sprite.Update();
 
-	dText.Print(50, 50, 1.5, "nearZ : %f", matPro->nearZ);
-	dText.Print(50, 75, 1.5, "farZ  : %f", matPro->farZ);
+	dText.Print(50, 50, 1.5, "chest : UI");
+	dText.Print(50, 75, 1.5, "hip   : JK");
 }
 
 void IF::Scene5::Draw()
 {
 	graph->DrawBlendMode(commandList.Get());
 	obj[0].DrawBefore(commandList.Get(), graph->rootsignature.Get(), cb.GetGPUAddress());
-	for (int i = 0; i < _countof(obj); i++)
+	for (int i = 1; i < _countof(obj); i++)
 	{
 		obj[i].Draw(commandList.Get(), viewport, texNum);
 	}
