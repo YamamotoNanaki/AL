@@ -56,7 +56,9 @@ void IF::Scene3::Initialize()
 
 	//2DŠÖ˜A
 	sprite.StaticInitialize(device.Get(), commandList.Get(), (float)winWidth, (float)winHeight);
-	sprite.Initialize(0);
+	sprite.Initialize(tex->LoadTexture("Resources/reticle.png"));
+	sprite.position = { (float)winWidth / 2,(float)winHeight / 2 };
+	sprite.Update();
 	dText.Initialize(tex->LoadTexture("Resources/debugfont.png"));
 
 	Rand random;
@@ -89,29 +91,29 @@ void IF::Scene3::Update()
 	for (int i = 0; i < 3; i++)light->SetDirLightColor(i, dlColor);
 
 	//ƒJƒƒ‰
-	if (input->KDown(KEY::W))
+	if (input->KDown(KEY::UP))
 	{
 		//matView.eye.z += 2;
 		matView.target.y += 2;
 	}
-	if (input->KDown(KEY::S))
+	if (input->KDown(KEY::DOWN))
 	{
 		//matView.eye.z -= 2;
 		matView.target.y -= 2;
 	}
-	if (input->KDown(KEY::A))
+	if (input->KDown(KEY::LEFT))
 	{
 		//matView.eye.x += 2;
 		matView.target.x -= 2;
 	}
-	if (input->KDown(KEY::D))
+	if (input->KDown(KEY::RIGHT))
 	{
 		//matView.eye.x -= 2;
 		matView.target.x += 2;
 	}
-	static float zoom = 45.0f;
-	if (input->KDown(KEY::UP))zoom++;
-	if (input->KDown(KEY::DOWN))zoom--;
+	//if (input->KDown(KEY::UP))zoom++;
+	//if (input->KDown(KEY::DOWN))zoom--;
+	if (input->KTriggere(KEY::SPACE))zoom = zoom == 45 ? 20 : 45;
 	matPro->fovAngle = zoom;
 	//static int rota = 90;
 	//if (input->KDown(KEY::SPACE))rota++;
@@ -124,8 +126,6 @@ void IF::Scene3::Update()
 	{
 		obj[i].Update(matView.Get(), matPro->Get(), matView.eye);
 	}
-	sprite.position = { 540,500 };
-	sprite.Update();
 
 	dText.Print(50, 50, 1.5, "eye      : %f,%f,%f", matView.eye.x, matView.eye.y, matView.eye.z);
 	dText.Print(50, 75, 1.5, "target   : %f,%f,%f", matView.target.x, matView.target.y, matView.target.z);
@@ -143,5 +143,6 @@ void IF::Scene3::Draw()
 	}
 	graph->DrawBlendMode(commandList.Get(), Blend::NORMAL2D);
 	sprite.DrawBefore(graph->rootsignature.Get(), cb.GetGPUAddress());
+	if (zoom == 20)sprite.Draw(viewport);
 	dText.Draw(viewport);
 }
