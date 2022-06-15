@@ -1,6 +1,8 @@
 #include "Scene3.h"
 #include "Input.h"
 #include "Rand.h"
+#include "Ease.h"
+#include "Timer.h"
 
 using namespace IF;
 using namespace DirectX;
@@ -113,7 +115,33 @@ void IF::Scene3::Update()
 	}
 	//if (input->KDown(KEY::UP))zoom++;
 	//if (input->KDown(KEY::DOWN))zoom--;
-	if (input->KTriggere(KEY::SPACE))zoom = zoom == 45 ? 20 : 45;
+	static float zoom = 45.0f;
+	static Timer time;
+	flag = false;
+	if (input->KDown(KEY::SPACE))
+	{
+		flag = true;
+		if(input->KTriggere(KEY::SPACE))time.Set(15);
+	}
+	if (flag)
+	{
+		if (time.IsEnd())zoom = 20;
+		else
+		{
+			time.Update();
+			zoom = Ease::InOutQuad(45, 20, 15, time.NowTime());
+		}
+	}
+	else
+	{
+		if (zoom < 45)
+		{
+			if (input->KRelease(KEY::SPACE))time.Set(15);
+			time.Update();
+			zoom = Ease::InOutQuad(20, 45, 15, time.NowTime());
+		}
+		else zoom = 45;
+	}
 	matPro->fovAngle = zoom;
 	//static int rota = 90;
 	//if (input->KDown(KEY::SPACE))rota++;
@@ -143,6 +171,6 @@ void IF::Scene3::Draw()
 	}
 	graph->DrawBlendMode(commandList.Get(), Blend::NORMAL2D);
 	sprite.DrawBefore(graph->rootsignature.Get(), cb.GetGPUAddress());
-	if (zoom == 20)sprite.Draw(viewport);
+	if (flag)sprite.Draw(viewport);
 	dText.Draw(viewport);
 }

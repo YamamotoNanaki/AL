@@ -27,7 +27,7 @@ namespace IF
 		DirectX::XMFLOAT3 csAtten{ 0.5f,0.6f,0.0f };
 		DirectX::XMFLOAT2 csAngle{ 0.0f,0.7f };
 		unsigned short texNum = 0;
-		int zoom = 45.0f;
+		bool flag = false;
 
 		//--------------------------//
 
