@@ -148,6 +148,7 @@ void IF::Scene5::Update()
 	if (rota2 >= 360)rota2 -= 360;
 	static bool flag3 = false;
 	static float powor = 0;
+
 	if (input->KTriggere(KEY::SPACE))
 	{
 		flag3 = true;
