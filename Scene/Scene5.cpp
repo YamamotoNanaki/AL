@@ -121,8 +121,11 @@ void IF::Scene5::Update()
 	obj[0].rotation.y = ConvertToRadians(rota2);
 
 	static float rota = 0;
-	rota += 6;
-	if (rota >= 360)rota -= 360;
+	static bool flag = false;
+	if (flag == false)rota += 6;
+	if (flag == true)rota -= 6;
+	if (rota >= 45)flag = true;
+	if (rota <= -45)flag = false;
 	if (rota2 >= 360)rota2 -= 360;
 	//if (input->KDown(KEY::U))rota -= 2;
 	//if (input->KDown(KEY::I))rota += 2;
