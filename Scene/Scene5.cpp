@@ -81,6 +81,14 @@ void IF::Scene5::Initialize()
 	obj[6].position = { -15,-15,0 };
 	obj[7].parent = &obj[0];
 	obj[7].position = { 0,0,0 };
+	obj[8].parent = &obj[5];
+	obj[8].position = { 0,-10,0 };
+	obj[9].parent = &obj[6];
+	obj[9].position = { 0,-10,0 };
+	obj[10].parent = &obj[2];
+	obj[10].position = { 0,-10,0 };
+	obj[11].parent = &obj[3];
+	obj[11].position = { 0,-10,0 };
 }
 
 void IF::Scene5::Update()
@@ -120,23 +128,34 @@ void IF::Scene5::Update()
 
 	obj[0].rotation.y = ConvertToRadians(rota2);
 
-	static float rota = 0;
+	static int rota = 0;
 	static bool flag = false;
-	if (flag == false)rota += 6;
-	if (flag == true)rota -= 6;
-	if (rota >= 45)flag = true;
-	if (rota <= -45)flag = false;
+	bool flag2 = false;
+	if (input->KDown(KEY::W))flag2 = true;
+	if (flag2)
+	{
+		if (flag == false)rota += 6;
+		if (flag == true)rota -= 6;
+		if (rota >= 45)flag = true;
+		if (rota <= -45)flag = false;
+	}
+	else
+	{
+		if (rota == 0);
+		else if (rota > 0)rota -= 6;
+		else if (rota < 0)rota += 6;
+	}
 	if (rota2 >= 360)rota2 -= 360;
 	//if (input->KDown(KEY::U))rota -= 2;
 	//if (input->KDown(KEY::I))rota += 2;
 	//static float rota2 = 0;
 	//if (input->KDown(KEY::J))rota2 -= 2;
 	//if (input->KDown(KEY::K))rota2 += 2;
-
-	obj[2].rotation = { ConvertToRadians(rota),0,0 };
-	obj[3].rotation = { ConvertToRadians(-rota),0,0 };
-	obj[5].rotation = { ConvertToRadians(-rota), 0,0 };
-	obj[6].rotation = { ConvertToRadians(rota), 0,0 };
+	float rotaf = rota;
+	obj[2].rotation = { ConvertToRadians(rotaf),0,0 };
+	obj[3].rotation = { ConvertToRadians(-rotaf),0,0 };
+	obj[5].rotation = { ConvertToRadians(-rotaf), 0,0 };
+	obj[6].rotation = { ConvertToRadians(rotaf), 0,0 };
 
 	//ƒJƒƒ‰
 	//if (input->KDown(KEY::UP))
