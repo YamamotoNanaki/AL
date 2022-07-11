@@ -92,55 +92,61 @@ void IF::Scene3::Update()
 
 	for (int i = 0; i < 3; i++)light->SetDirLightColor(i, dlColor);
 
+	static float zoom = 45.0f;
 	//ƒJƒƒ‰
 	if (input->KDown(KEY::UP))
 	{
 		//matView.eye.z += 2;
-		matView.target.y += 2;
+		matView.target.y += zoom > 40 ? 2 : zoom > 20 ? 1 : 0.5;
 	}
 	if (input->KDown(KEY::DOWN))
 	{
 		//matView.eye.z -= 2;
-		matView.target.y -= 2;
+		matView.target.y -= zoom > 40 ? 2 : zoom > 20 ? 1 : 0.5;
 	}
 	if (input->KDown(KEY::LEFT))
 	{
 		//matView.eye.x += 2;
-		matView.target.x -= 2;
+		matView.target.x -= zoom > 40 ? 2 : zoom > 20 ? 1 : 0.5;
 	}
 	if (input->KDown(KEY::RIGHT))
 	{
 		//matView.eye.x -= 2;
-		matView.target.x += 2;
+		matView.target.x += zoom > 40 ? 2 : zoom > 20 ? 1 : 0.5;
 	}
-	//if (input->KDown(KEY::UP))zoom++;
-	//if (input->KDown(KEY::DOWN))zoom--;
-	static float zoom = 45.0f;
-	static Timer time;
-	flag = false;
-	if (input->KDown(KEY::SPACE))
+
+	static float zoomT = 0;
+	static float oldzoomT = 0;
+	static bool flag2 = false;
+	static const float max = 15;
+	static Timer timer;
+	if (input->KTriggere(KEY::SPACE))
 	{
-		flag = true;
-		if(input->KTriggere(KEY::SPACE))time.Set(15);
+		zoom = zoom == 45 ? 30 : 45;
+		flag = !flag;
 	}
 	if (flag)
 	{
-		if (time.IsEnd())zoom = 20;
-		else
+		if (input->KTriggere(KEY::S) && !flag2)
 		{
-			time.Update();
-			zoom = Ease::InOutQuad(45, 20, 15, time.NowTime());
+			zoomT = 30.0f;
+			oldzoomT = zoom;
+			flag2 = true;
+			timer.Set(max);
+		}
+		if (input->KTriggere(KEY::W) && !flag2)
+		{
+			zoomT = 10.0f;
+			oldzoomT = zoom;
+			flag2 = true;
+			timer.Set(max);
 		}
 	}
-	else
+	if (flag2)
 	{
-		if (zoom < 45)
-		{
-			if (input->KRelease(KEY::SPACE))time.Set(15);
-			time.Update();
-			zoom = Ease::InOutQuad(20, 45, 15, time.NowTime());
-		}
-		else zoom = 45;
+		timer.Update();
+		zoom = Ease::InOutQuad(oldzoomT, zoomT, max, timer.NowTime());
+		if (timer.IsEnd())flag2 = false;
 	}
 	matPro->fovAngle = zoom;
 	//static int rota = 90;
