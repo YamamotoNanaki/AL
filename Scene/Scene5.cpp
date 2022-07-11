@@ -146,6 +146,23 @@ void IF::Scene5::Update()
 		else if (rota < 0)rota += 6;
 	}
 	if (rota2 >= 360)rota2 -= 360;
+	static bool flag3 = false;
+	static float powor = 0;
+	if (input->KTriggere(KEY::SPACE))
+	{
+		flag3 = true;
+		powor = 7;
+	}
+	if (flag3)
+	{
+		obj[0].position.y += powor;
+		powor--;
+		if (obj[0].position.y < 10)
+		{
+			flag3 = false;
+			obj[0].position.y = 10;
+		}
+	}
 	//if (input->KDown(KEY::U))rota -= 2;
 	//if (input->KDown(KEY::I))rota += 2;
 	//static float rota2 = 0;
