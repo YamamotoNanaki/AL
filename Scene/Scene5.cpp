@@ -109,21 +109,31 @@ void IF::Scene5::Update()
 
 	matPro->Update();
 
+	static float rota2 = 0;
 
-	if (input->KDown(KEY::W))obj[0].position.y += 2;
-	if (input->KDown(KEY::S))obj[0].position.y -= 2;
-	if (input->KDown(KEY::D))obj[0].position.x += 2;
-	if (input->KDown(KEY::A))obj[0].position.x -= 2;
+	//if (input->KDown(KEY::W))obj[0].position.y += 2;
+	//if (input->KDown(KEY::S))obj[0].position.y -= 2;
+	if (input->KDown(KEY::RIGHT))obj[0].position.x += 2;
+	if (input->KDown(KEY::LEFT))obj[0].position.x -= 2;
+	if (input->KDown(KEY::D))rota2 += 4;
+	if (input->KDown(KEY::A))rota2 -= 4;
+
+	obj[0].rotation.y = ConvertToRadians(rota2);
 
 	static float rota = 0;
-	if (input->KDown(KEY::U))rota -= 2;
-	if (input->KDown(KEY::I))rota += 2;
-	static float rota2 = 0;
-	if (input->KDown(KEY::J))rota2 -= 2;
-	if (input->KDown(KEY::K))rota2 += 2;
+	rota += 6;
+	if (rota >= 360)rota -= 360;
+	if (rota2 >= 360)rota2 -= 360;
+	//if (input->KDown(KEY::U))rota -= 2;
+	//if (input->KDown(KEY::I))rota += 2;
+	//static float rota2 = 0;
+	//if (input->KDown(KEY::J))rota2 -= 2;
+	//if (input->KDown(KEY::K))rota2 += 2;
 
-	obj[7].rotation = { 0,ConvertToRadians(rota),0 };
-	obj[4].rotation = { 0,ConvertToRadians(rota2),0 };
+	obj[2].rotation = { ConvertToRadians(rota),0,0 };
+	obj[3].rotation = { ConvertToRadians(-rota),0,0 };
+	obj[5].rotation = { ConvertToRadians(-rota), 0,0 };
+	obj[6].rotation = { ConvertToRadians(rota), 0,0 };
 
 	//ƒJƒƒ‰
 	//if (input->KDown(KEY::UP))
