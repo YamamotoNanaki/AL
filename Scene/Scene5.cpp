@@ -169,8 +169,6 @@ void IF::Scene5::Update()
 	sprite.position = { 540,500 };
 	sprite.Update();
 
-	dText.Print(50, 50, 1.5, "chest : UI");
-	dText.Print(50, 75, 1.5, "hip   : JK");
 }
 
 void IF::Scene5::Draw()
