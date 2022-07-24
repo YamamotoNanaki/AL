@@ -3,19 +3,21 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <cassert>
 
-using namespace DirectX;
 using namespace IF;
 using namespace std;
 using namespace IF::BillBoard;
+using namespace Microsoft::WRL;
 
 LightManager* Object::light = nullptr;
+ComPtr<ID3D12Device> Object::device = nullptr;
+ComPtr<ID3D12GraphicsCommandList> Object::commandList = nullptr;
 
-void IF::Object::DrawBefore(ID3D12GraphicsCommandList* commandList, ID3D12RootSignature* root, D3D12_GPU_VIRTUAL_ADDRESS GPUAddress, D3D_PRIMITIVE_TOPOLOGY topology)
+void IF::Object::DrawBefore(ID3D12RootSignature* root, D3D_PRIMITIVE_TOPOLOGY topology)
 {
 	commandList->SetGraphicsRootSignature(root);
 	commandList->IASetPrimitiveTopology(topology);
-	commandList->SetGraphicsRootConstantBufferView(0, GPUAddress);
 }
 
 void IF::Object::SetModel(Model* model)
@@ -23,7 +25,7 @@ void IF::Object::SetModel(Model* model)
 	this->model = model;
 }
 
-void IF::Object::Initialize(ID3D12Device* device, Model* model)
+void IF::Object::Initialize(Model* model)
 {
 	HRESULT result;
 	//定数バッファのヒープ設定
@@ -50,21 +52,23 @@ void IF::Object::Initialize(ID3D12Device* device, Model* model)
 	assert(SUCCEEDED(result));
 
 	this->model = model;
+
+	cb.Initialize(device.Get());
 }
 
-void Object::Update(XMMATRIX matView, XMMATRIX matProjection, XMFLOAT3 cameraPos, BillBoardMode mode)
+void Object::Update(Matrix matView, Matrix matProjection, Float3 cameraPos, int mode)
 {
-	XMMATRIX matScale, matRot, matTrams;
+	Matrix matScale, matRot, matTrams;
 
 	//スケール、回転、平行移動
-	matScale = XMMatrixScaling(scale.x, scale.y, scale.z);
-	matRot = XMMatrixIdentity();
-	matRot *= XMMatrixRotationZ(rotation.z);
-	matRot *= XMMatrixRotationX(rotation.x);
-	matRot *= XMMatrixRotationY(rotation.y);
-	matTrams = XMMatrixTranslation(position.x, position.y, position.z);
+	matScale = MatrixScaling(scale.x, scale.y, scale.z);
+	matRot = MatrixIdentity();
+	matRot *= MatrixRotationZ(rotation.z);
+	matRot *= MatrixRotationX(rotation.x);
+	matRot *= MatrixRotationY(rotation.y);
+	matTrams = MatrixTranslation(position.x, position.y, position.z);
 	//ワールド行列の合成
-	matWorld = XMMatrixIdentity();
+	matWorld = MatrixIdentity();
 	if (mode == BILLBOARD)matWorld *= View::matBillBoard;
 	else if (mode == YBOARD)matWorld *= View::matBillBoardY;
 	matWorld *= matScale;
@@ -77,12 +81,12 @@ void Object::Update(XMMATRIX matView, XMMATRIX matProjection, XMFLOAT3 cameraPos
 	}
 
 	//定数バッファへのデータ転送
-	constMapTransform->viewPro = MatrixConvert(matView * matProjection);
-	constMapTransform->world = MatrixConvert(matWorld);
-	constMapTransform->cameraPos = Float3Convert(cameraPos);
+	constMapTransform->viewPro = matView * matProjection;
+	constMapTransform->world = matWorld;
+	constMapTransform->cameraPos = cameraPos;
 }
 
-void Object::Draw(ID3D12GraphicsCommandList* commandList, vector<D3D12_VIEWPORT> viewport)
+void Object::Draw(vector<D3D12_VIEWPORT> viewport)
 {
 	if (model == nullptr)
 	{
@@ -90,12 +94,12 @@ void Object::Draw(ID3D12GraphicsCommandList* commandList, vector<D3D12_VIEWPORT>
 		return;
 	}
 
-	light->Draw(commandList, 4);
-
-	model->Draw(commandList, viewport, constBuffTransform.Get());
+	light->Draw(4);
+	commandList->SetGraphicsRootConstantBufferView(0, cb.GetGPUAddress());
+	model->Draw(Object::commandList.Get(), viewport, constBuffTransform.Get());
 }
 
-void IF::Object::Draw(ID3D12GraphicsCommandList* commandList, vector<D3D12_VIEWPORT> viewport, unsigned short texNum)
+void IF::Object::Draw(vector<D3D12_VIEWPORT> viewport, unsigned short texNum)
 {
 	if (model == nullptr)
 	{
@@ -103,12 +107,27 @@ void IF::Object::Draw(ID3D12GraphicsCommandList* commandList, vector<D3D12_VIEWP
 		return;
 	}
 
-	light->Draw(commandList, 4);
+	light->Draw(4);
 
-	model->Draw(commandList, viewport, constBuffTransform.Get(), texNum);
+	model->Draw(Object::commandList.Get(), viewport, constBuffTransform.Get(), texNum);
 }
 
 Object::~Object()
 {
 	constBuffTransform->Unmap(0, nullptr);
+}
+
+void IF::Object::SetColor(int r, int g, int b, int a)
+{
+	cb.SetColor(r, g, b, a);
+}
+
+void IF::Object::SetBright(int r, int g, int b)
+{
+	cb.SetBright(r, g, b);
+}
+
+void IF::Object::SetAlpha(int alpha)
+{
+	cb.SetAlpha(alpha);
 }

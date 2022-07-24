@@ -1,35 +1,42 @@
 #pragma once
 #include <d3d12.h>
-#include <DirectXMath.h>
 #include <wrl.h>
 #include <vector>
 #include <string>
 #include "ModelVI.h"
 #include "ConstStruct.h"
+#include "IFMath.h"
 
 #pragma comment(lib,"d3d12.lib") 
 
 namespace IF
 {
+	enum ModelCreateNums
+	{
+		LOAD_MODEL,
+		CREATE_CUBE,
+		CREATE_TRIANGLE,
+		CREATE_CIRCLE,
+		CREATE_SPHERE
+	};
 	class Model
 	{
 		template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 		template<class T> using vector = std::vector<T>;
-		using XMFLOAT3 = DirectX::XMFLOAT3;
-		using XMMATRIX = DirectX::XMMATRIX;
 	private:
 		//定数バッファ
 		ComPtr<ID3D12Resource> constBuffTransform1;
 		ConstBufferMaterial* constMapMaterial = nullptr;
 		static ComPtr<ID3D12Device> device;
+		std::string tag;
 
 	public:
 		struct Material
 		{
 			std::string name;
-			XMFLOAT3 ambient;
-			XMFLOAT3 diffuse;
-			XMFLOAT3 specular;
+			Float3 ambient;
+			Float3 diffuse;
+			Float3 specular;
 			float alpha;
 			std::string textureFilename;
 			Material()
@@ -46,14 +53,30 @@ namespace IF
 	public:
 		MVI* vi = nullptr;
 		Material material{};
+		std::string name;
+		bool smooth = false;
+		unsigned short type = 0;
 
 	public:
 		static void SetDevice(ID3D12Device* device);
-		void LoadModel(std::string name, bool smoothing = false);
-		void CreateCube(bool smoothing = false);
+		bool LoadModel(std::string name, bool smoothing = false);
+		void CreateCube(unsigned short texNum, bool smoothing = false);
+		void CreateTriangle(unsigned short texNum, bool smoothing = false);
+		void CreateCircle(unsigned short texNum, bool smoothing = false);
+		void CreateSphere(unsigned short texNum, bool smoothing = false);
 		void VIInitialize(bool smoothing, bool normal = false);
 		void Draw(ID3D12GraphicsCommandList* commandList, vector<D3D12_VIEWPORT> viewport, ID3D12Resource* address);
 		void Draw(ID3D12GraphicsCommandList* commandList, vector<D3D12_VIEWPORT> viewport, ID3D12Resource* address, unsigned short texNum);
+		unsigned short GetTexNum();
+		void SetTexNum(unsigned short texNum);
 		~Model();
+		inline void SetTag(std::string tag)
+		{
+			this->tag = tag;
+		}
+		inline std::string GetTag()
+		{
+			return tag;
+		}
 	};
 }

@@ -1,8 +1,10 @@
 #pragma once
 #include "SpriteVI.h"
 #include "IFMath.h"
+#include "ConstBuff.h"
 #include <vector>
 #include <wrl.h>
+#include <string>
 
 namespace IF
 {
@@ -23,10 +25,11 @@ namespace IF
 		static ComPtr<ID3D12GraphicsCommandList> commandList;
 		static ComPtr<ID3D12Device> device;
 		static Matrix matPro;
+		static std::vector<D3D12_VIEWPORT> viewport;
 
 	private:
 		SV* vi = nullptr;
-		unsigned int texNum = 0;
+		ConstBuff cb;
 
 	public:
 		//定数バッファ
@@ -45,17 +48,24 @@ namespace IF
 		Float2 anchorpoint = { 0.5,0.5 };
 		bool flipX = false;
 		bool flipY = false;
+		std::string tag;
+		unsigned int texNum = 0;
 
 	public:
-		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, float winWidth, float winHeight);
+		~Sprite();
+		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, std::vector<D3D12_VIEWPORT> viewport, float winWidth, float winHeight);
 		static void SetDeviceCommand(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
+		static void SetViewport(std::vector<D3D12_VIEWPORT> viewport);
 		void Initialize(unsigned int texNum, Float2 size = { 100,100 }, bool flipX = false, bool flipY = false);
 		void TransferVertex();
-		void DrawBefore(ID3D12RootSignature* root, D3D12_GPU_VIRTUAL_ADDRESS GPUAddress, D3D_PRIMITIVE_TOPOLOGY topology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		static void DrawBefore(ID3D12RootSignature* root, D3D_PRIMITIVE_TOPOLOGY topology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 		void Update();
-		void Draw(std::vector<D3D12_VIEWPORT> viewport);
+		void Draw();
 		void SetPosition(Float2 position);
 		void SetSize(Float2 size);
 		void SetTextureRect(Float2 texBase, Float2 texSize);
+		void SetColor(int r, int g, int b, int a);
+		void SetBright(int r, int g, int b);
+		void SetAlpha(int a);
 	};
 }

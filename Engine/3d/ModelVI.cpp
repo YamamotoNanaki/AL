@@ -1,7 +1,7 @@
 #include "ModelVI.h"
+#include <cassert>
 
 using namespace std;
-using namespace DirectX;
 
 void IF::MVI::SetVerticleIndex(std::vector<Vertex> vertices, size_t vertexCount, std::vector<unsigned short> indices, size_t indexCount)
 {
@@ -41,27 +41,7 @@ void IF::MVI::Initialize(ID3D12Device* device, bool smoothing, bool flag)
 
 #pragma region 法線ベクトルの計算
 
-	if (smoothing)
-	{
-		auto itr = smoothData.begin();
-		for (; itr != smoothData.end(); ++itr)
-		{
-			vector<unsigned short>& v = itr->second;
-
-			XMVECTOR normal = {};
-			for (unsigned short index : v)
-			{
-				normal += XMVectorSet(vertices[index].normal.x, vertices[index].normal.y, vertices[index].normal.z, 0);
-			}
-			normal = XMVector3Normalize(normal / (float)v.size());
-			for (unsigned short index : v)
-			{
-				vertices[index].normal = { normal.m128_f32[0],normal.m128_f32[1],normal.m128_f32[2] };
-			}
-		}
-	}
-
-	if (!indices.size() == 0 && flag && !smoothing)
+	if (!indices.size() == 0 && flag)
 	{
 		for (int i = 0; i < indices.size() / 3; i++)
 		{
@@ -69,22 +49,46 @@ void IF::MVI::Initialize(ID3D12Device* device, bool smoothing, bool flag)
 			unsigned short index1 = indices[i * 3 + 1];
 			unsigned short index2 = indices[i * 3 + 2];
 
-			XMVECTOR p0 = XMLoadFloat3(&vertices[index0].pos);
-			XMVECTOR p1 = XMLoadFloat3(&vertices[index1].pos);
-			XMVECTOR p2 = XMLoadFloat3(&vertices[index2].pos);
+			Vector3 p0 = SetVector3(vertices[index0].pos);
+			Vector3 p1 = SetVector3(vertices[index1].pos);
+			Vector3 p2 = SetVector3(vertices[index2].pos);
 
-			XMVECTOR v1 = XMVectorSubtract(p1, p0);
-			XMVECTOR v2 = XMVectorSubtract(p2, p0);
+			Vector3 v1 = VectorSubtract(p1, p0);
+			Vector3 v2 = VectorSubtract(p2, p0);
 
-			XMVECTOR normal = XMVector3Cross(v1, v2);
+			Vector3 normal = Vector3Cross(v1, v2);
 
-			normal = XMVector3Normalize(normal);
+			normal = Vector3Normalize(normal);
 
-			XMStoreFloat3(&vertices[index0].normal, normal);
-			XMStoreFloat3(&vertices[index1].normal, normal);
-			XMStoreFloat3(&vertices[index2].normal, normal);
+			vertices[index0].normal = SetFloat3(normal);
+			vertices[index1].normal = SetFloat3(normal);
+			vertices[index2].normal = SetFloat3(normal);
 		}
 	}
+
+	if (smoothing)
+	{
+		auto itr = smoothData.begin();
+		for (; itr != smoothData.end(); ++itr)
+		{
+			vector<unsigned short>& v = itr->second;
+
+			Vector3 normal = {};
+			for (unsigned short index : v)
+			{
+				normal.x += vertices[index].normal.x;
+				normal.y += vertices[index].normal.y;
+				normal.z += vertices[index].normal.z;
+			}
+			Vector3 a = normal / (float)v.size();
+			normal = Vector3Normalize(a);
+			for (unsigned short index : v)
+			{
+				vertices[index].normal = { normal.x,normal.y,normal.z };
+			}
+		}
+	}
+
 
 #pragma endregion 法線ベクトルの計算
 

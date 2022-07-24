@@ -26,9 +26,9 @@ namespace IF
 		Vector3& operator-=(const Vector3& v);
 		Vector3& operator*=(float s);
 		Vector3& operator/=(float s);
-		Vector3& operator=(const Float3 f);
-
+		//Vector3& operator=(const Float3 f);
 	};
 
 	Vector3 VectorSubtract(Vector3 v1, Vector3 v2);
+	Vector3 operator/(Vector3 v, float s);
 };

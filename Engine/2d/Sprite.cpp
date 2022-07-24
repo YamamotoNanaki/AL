@@ -8,12 +8,19 @@ using namespace Microsoft::WRL;
 ComPtr < ID3D12GraphicsCommandList> Sprite::commandList = nullptr;
 ComPtr < ID3D12Device> Sprite::device = nullptr;
 Matrix Sprite::matPro;
+std::vector<D3D12_VIEWPORT> Sprite::viewport;
 
-void IF::Sprite::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, float winWidth, float winHeight)
+void IF::Sprite::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, std::vector<D3D12_VIEWPORT> viewport, float winWidth, float winHeight)
 {
 	SetDeviceCommand(device, commandList);
-
+	SetViewport(viewport);
 	Sprite::matPro = MatrixOrthoGraphicProjection(0, winWidth, 0, winHeight, 0, 1);
+}
+
+IF::Sprite::~Sprite()
+{
+	//constBuffTransform->Unmap(0, nullptr);
+	delete vi;
 }
 
 void IF::Sprite::SetDeviceCommand(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
@@ -89,35 +96,43 @@ void IF::Sprite::Initialize(unsigned int texNum, Float2 size, bool flipX, bool f
 	//定数バッファのマッピング
 	result = constBuffTransform->Map(0, nullptr, (void**)&constMapTransform);
 	assert(SUCCEEDED(result));
+
+	cb.Initialize(device.Get());
 }
 
-void IF::Sprite::DrawBefore(ID3D12RootSignature* root, D3D12_GPU_VIRTUAL_ADDRESS GPUAddress, D3D_PRIMITIVE_TOPOLOGY topology)
+void IF::Sprite::DrawBefore(ID3D12RootSignature* root, D3D_PRIMITIVE_TOPOLOGY topology)
 {
 	commandList->SetGraphicsRootSignature(root);
 	commandList->IASetPrimitiveTopology(topology);
-	commandList->SetGraphicsRootConstantBufferView(0, GPUAddress);
 }
 
 void IF::Sprite::Update()
 {
 	matWorld = MatrixIdentity();
-	matWorld *= MatrixRotationZ(ConvertToRadians(rotation));
+	matWorld *= MatrixScaling(scale.x, scale.y, 1);
+	matWorld *= MatrixRotationZ(rotation);
 	matWorld *= MatrixTranslation(position.x, position.y, 0);
 
 	//定数バッファへのデータ転送
 	constMapTransform->mat = matWorld * matPro;
 }
 
-void IF::Sprite::Draw(std::vector<D3D12_VIEWPORT> viewport)
+void IF::Sprite::SetViewport(std::vector<D3D12_VIEWPORT> viewport)
 {
+	Sprite::viewport = viewport;
+}
+
+void IF::Sprite::Draw()
+{
+	commandList->SetGraphicsRootConstantBufferView(0, cb.GetGPUAddress());
+	//頂点バッファの設定
+	commandList->IASetVertexBuffers(0, 1, &vi->GetVertexView());
+	//定数バッファビューの設定
+	commandList->SetGraphicsRootConstantBufferView(2, constBuffTransform->GetGPUVirtualAddress());
+	Texture::Instance()->setTexture(commandList.Get(), texNum);
 	for (int i = 0; i < viewport.size(); i++)
 	{
-		Texture::Instance()->setTexture(commandList.Get(), texNum);
 		commandList->RSSetViewports(1, &viewport[i]);
-		//頂点バッファの設定
-		commandList->IASetVertexBuffers(0, 1, &vi->GetVertexView());
-		//定数バッファビューの設定
-		commandList->SetGraphicsRootConstantBufferView(2, constBuffTransform->GetGPUVirtualAddress());
 		//描画コマンド
 		commandList->DrawInstanced(vi->GetSize(), 1, 0, 0);
 	}
@@ -140,6 +155,21 @@ void Sprite::SetTextureRect(Float2 texBase, Float2 texSize)
 
 	// 頂点バッファへのデータ転送
 	TransferVertex();
+}
+
+void IF::Sprite::SetColor(int r, int g, int b, int a)
+{
+	cb.SetColor(r, g, b, a);
+}
+
+void IF::Sprite::SetBright(int r, int g, int b)
+{
+	cb.SetBright(r, g, b);
+}
+
+void IF::Sprite::SetAlpha(int alpha)
+{
+	cb.SetAlpha(alpha);
 }
 
 void Sprite::TransferVertex()
@@ -176,7 +206,7 @@ void Sprite::TransferVertex()
 	vertices[RB].uv = { tex_right,	tex_bottom };
 	vertices[RT].uv = { tex_right,	tex_top };
 
-	ID3D12Resource* texBuff = Texture::Instance()->tex[texNum].texbuff.Get();
+	ComPtr<ID3D12Resource> texBuff = Texture::Instance()->tex[texNum].texbuff.Get();
 
 	if (texBuff)
 	{

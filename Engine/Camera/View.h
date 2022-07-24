@@ -1,25 +1,24 @@
 #pragma once
-#include <DirectXMath.h>
+#include "IFMath.h"
 
 namespace IF
 {
 	class View
 	{
-		using XMMATRIX = DirectX::XMMATRIX;
-		using XMFLOAT3 = DirectX::XMFLOAT3;
 	private:
-		XMMATRIX matView;
+		Matrix matView;
 
 	public:
-		static XMMATRIX matBillBoard;
-		static XMMATRIX matBillBoardY;
-		XMFLOAT3 eye;
-		XMFLOAT3 target;
-		XMFLOAT3 up;
+		static Matrix matBillBoard;
+		static Matrix matBillBoardY;
+		Float3 eye;
+		Float3 target;
+		Float3 up;
 	public:
-		View(XMFLOAT3 eye = { 0,0,-100 }, XMFLOAT3 target = { 0,0,1 }, XMFLOAT3 up = { 0,1,0 });
-		void Initialze(XMFLOAT3 eye, XMFLOAT3 target, XMFLOAT3 up);
+		View(Float3 eye = { 0,0,-100 }, Float3 target = { 0,0,1 }, Float3 up = { 0,1,0 });
+		void Initialze(Float3 eye, Float3 target, Float3 up);
 		void Update();
-		XMMATRIX Get()const;
+		Matrix Get()const;
+		Matrix* GetAddressOf();
 	};
 }

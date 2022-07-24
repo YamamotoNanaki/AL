@@ -127,6 +127,8 @@ void Graphic::Compiller(LPCWSTR vs, LPCWSTR ps, LPCWSTR gs, char compile)
 //		result = device->CreateGraphicsPipelineState(&pipeline.pipelineDesc[j], IID_PPV_ARGS(&pipelinestate[j]));
 //	}
 //	assert(SUCCEEDED(result));
+// 
+//	delete rootSigBlob;
 //
 //	return result;
 //
@@ -249,7 +251,7 @@ void IF::Graphic::InitializeParticle(D3D12_DESCRIPTOR_RANGE& descRangeSRV)
 
 	RootParam root(descRangeSRV, 1);
 
-	Compiller(L"ParticleVS.hlsl", L"ParticlePS.hlsl", L"ParticleGS.hlsl");
+	Compiller(L"Data/Shaders/ParticleVS.hlsl", L"Data/Shaders/ParticlePS.hlsl", L"Data/Shaders/ParticleGS.hlsl");
 
 	D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
 		{// xyzç¿ïW

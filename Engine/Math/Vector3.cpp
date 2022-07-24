@@ -46,7 +46,7 @@ Vector3 Vector3::operator+() const
 
 Vector3 Vector3::operator-() const
 {
-	return *this;
+	return Vector3(-x, -y, -z);
 }
 
 Vector3& Vector3::operator+=(const Vector3& v)
@@ -81,13 +81,13 @@ Vector3& Vector3::operator/=(float s)
 	return *this;
 }
 
-Vector3& Vector3::operator=(const Float3 f)
-{
-	x = f.x;
-	y = f.y;
-	z = f.z;
-	return *this;
-}
+//Vector3& Vector3::operator=(const Float3 f)
+//{
+//	x = f.x;
+//	y = f.y;
+//	z = f.z;
+//	return *this;
+//}
 
 const Vector3 operator+(const Vector3& v1, const Vector3& v2)
 {
@@ -121,5 +121,11 @@ const Vector3 operator/(const Vector3& v, float s)
 
 Vector3 IF::VectorSubtract(Vector3 v1, Vector3 v2)
 {
-	return Vector3(v1 - v2);
+	Vector3 a(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+	return a;
+}
+
+Vector3 IF::operator/(Vector3 v, float s)
+{
+	return Vector3(v.x / s, v.y / s, v.z / s);
 }

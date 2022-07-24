@@ -25,7 +25,7 @@ Matrix IF::Matrix::operator+() const
 
 Matrix IF::Matrix::operator-() const
 {
-	return *this;
+	return Matrix(-_1_1, -_1_2, -_1_3, -_1_4, -_2_1, -_2_2, -_2_3, -_2_4, -_3_1, -_3_2, -_3_3, -_3_4, -_4_1, -_4_2, -_4_3, -_4_4);
 }
 
 Matrix IF::Matrix::operator*(float s)const
@@ -175,8 +175,11 @@ Matrix IF::MatrixIdentity()
 
 Matrix IF::MatrixTranspose(const Matrix& m)
 {
-	return Matrix(m._1_1, m._2_1, m._3_1, m._4_1, m._1_2, m._2_2, m._3_2, m._4_2,
-		m._1_3, m._2_3, m._3_3, m._4_3, m._1_4, m._2_4, m._3_4, m._4_4);
+	return Matrix(
+		m._1_1, m._2_1, m._3_1, m._4_1,
+		m._1_2, m._2_2, m._3_2, m._4_2,
+		m._1_3, m._2_3, m._3_3, m._4_3,
+		m._1_4, m._2_4, m._3_4, m._4_4);
 }
 
 Matrix IF::MatrixScaling(float sx, float sy, float sz)

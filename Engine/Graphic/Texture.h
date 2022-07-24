@@ -1,6 +1,5 @@
 #pragma once
 #include <DirectXTex.h>
-#include <DirectXMath.h>
 #include <d3d12.h>
 #include <wrl.h>
 #include <string>
@@ -26,7 +25,7 @@ namespace IF
 		};
 
 	private:
-		static const short textureMax = 256;
+		static const short textureMax = 1024;
 		unsigned short textureSize = 0;
 		static ComPtr<ID3D12Device> device;
 
@@ -48,5 +47,14 @@ namespace IF
 		void Initialize();
 		void setTexture(ID3D12GraphicsCommandList* commandList, unsigned short texHandle);
 		unsigned short LoadTexture(const std::string filename);
+		void GUIInit();
+		unsigned short folder = 0;
+
+//#ifdef _DEBUG
+		bool flag = false;
+		void GUI();
+		void TexNum(int* texNum);
+		int GetTagNum();
+//#endif
 	};
 }

@@ -13,6 +13,7 @@ namespace IF
 		Matrix viewPro;
 		Matrix world;
 		Float3 cameraPos;
+		float pad;
 	};
 
 	struct ConstBufferBillboard

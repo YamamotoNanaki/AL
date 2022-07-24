@@ -65,10 +65,7 @@ Vector3& IF::Vector3Normalize(Vector3& v)
 	float length = v.Length();
 	if (length != 0)
 	{
-		Vector3 a;
-		a.x = v.x / length;
-		a.y = v.y / length;
-		a.z = v.z / length;
+		Vector3 a = v / length;
 		return a;
 	}
 	return v;
@@ -140,9 +137,37 @@ float IF::ConvertToRadians(float fDegrees)
 	return fDegrees * (M_PI / 180.0f);
 }
 
+float IF::ConvertToDegrees(float fRadians)
+{
+	return fRadians * (180.0f / M_PI);
+}
+
+Vector3 IF::Vector3Transform(const Vector3& v, const Matrix& m)
+{
+	Vector3 mx = { m._1_1,m._1_2,m._1_3 };
+	Vector3 my = { m._2_1,m._2_2,m._2_3 };
+	Vector3 mz = { m._3_1,m._3_2,m._3_3 };
+	Vector3 mw = { m._4_1,m._4_2,m._4_3 };
+
+	Vector3 Result = {
+		v.z * mz.x + mw.x,
+		v.z * mz.y + mw.y,
+		v.z * mz.z + mw.z };
+	Result = {
+		v.y * my.x + Result.x,
+		v.y * my.y + Result.y,
+		v.y * my.z + Result.z };
+	Result = {
+		v.x * mx.x + Result.x,
+		v.x * mx.y + Result.y,
+		v.x * mx.z + Result.z };
+
+	return Result;
+}
+
 Vector3 IF::VectorNegate(Vector3 m)
 {
-	return Vector3(-m);
+	return -m;
 }
 
 Matrix IF::MatrixPerspectiveFovLH(float FovAngleY, float AspectRatio, float NearZ, float FarZ)
@@ -160,5 +185,5 @@ Matrix IF::MatrixPerspectiveFovLH(float FovAngleY, float AspectRatio, float Near
 	float Width = Height / AspectRatio;
 	float fRange = FarZ / (FarZ - NearZ);
 
-	return Matrix(Width, 0, 0, 0, 0, Height, 0, 0, 0, 0, fRange, 0, 0, 0, -fRange * NearZ, 0);
+	return Matrix(Width, 0, 0, 0, 0, Height, 0, 0, 0, 0, fRange, 1, 0, 0, -fRange * NearZ, 0);
 }

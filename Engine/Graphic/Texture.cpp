@@ -2,6 +2,7 @@
 #include <d3dx12.h>
 #include <d3d12.h>
 #include "Input.h"
+#include "ImGui.h"
 
 using namespace DirectX;
 using namespace IF;
@@ -16,6 +17,7 @@ IF::Texture::Texture()
 	descRangeSRV.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;									//種別はテクスチャ
 	descRangeSRV.BaseShaderRegister = 0;														//0番スロットから
 	descRangeSRV.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	tex[0].free = true;
 }
 
 Texture* IF::Texture::Instance()
@@ -63,14 +65,14 @@ unsigned short Texture::LoadTexture(const std::string filename)
 	TexMetadata metadata{};
 	ScratchImage scratchImg{};
 
-	for (int i = 0; i < textureMax; i++)
+	for (int i = 1; i < textureMax; i++)
 	{
 		if (tex[i].free == false)continue;
 		if (tex[i].texName == filename)return i;
 	}
 
 	unsigned short num = 0;
-	for (int i = 0; i < textureMax; i++)
+	for (int i = 1; i < textureMax; i++)
 	{
 		if (tex[i].free == false)
 		{
@@ -81,8 +83,9 @@ unsigned short Texture::LoadTexture(const std::string filename)
 
 	Tex newtex;
 	newtex.texName = filename;
+	string file = "Data/Resources/" + filename;
 	wchar_t szFile[256];
-	MultiByteToWideChar(CP_ACP, 0, filename.c_str(), -1, szFile, _countof(szFile));
+	MultiByteToWideChar(CP_ACP, 0, file.c_str(), -1, szFile, _countof(szFile));
 
 
 	HRESULT result = LoadFromWICFile(
@@ -122,6 +125,8 @@ unsigned short Texture::LoadTexture(const std::string filename)
 		nullptr,
 		IID_PPV_ARGS(&newtex.texbuff));
 
+	if (newtex.texbuff == nullptr)return 0;
+
 	for (size_t i = 0; i < metadata.mipLevels; i++)
 	{
 		const Image* img = scratchImg.GetImage(i, 0, 0);
@@ -160,6 +165,52 @@ unsigned short Texture::LoadTexture(const std::string filename)
 	textureSize++;
 
 	return num;
+}
+
+//#ifdef _DEBUG
+void IF::Texture::GUI()
+{
+	if (!flag)flag = ImGui::ImageButton((ImTextureID)tex[folder].GPUHandle.ptr, { 96,96 });
+	else
+	{
+		int j = 0;
+		for (int i = 0; i < 256; i++)
+		{
+			if (i == folder)continue;
+			if (j % 7 != 0)ImGui::SameLine();
+			if (tex[i].free == true)
+			{
+				ImGui::Text("%03d", i);
+				ImGui::SameLine();
+				ImGui::Image((ImTextureID)tex[i].GPUHandle.ptr, { 96,96 });
+				j++;
+			}
+		}
+	}
+}
+
+void IF::Texture::TexNum(int* texNum)
+{
+	int j = 0;
+	for (int i = 0; i < 256; i++)
+	{
+		if (i == folder)continue;
+		if (!tex[i].free)continue;
+		string _tagName;
+		if (i < 10)_tagName = "00";
+		else if (i < 100)_tagName = "0";
+		else _tagName = "";
+		_tagName += (char)(i + 48);
+		if (j % 3 != 0)ImGui::SameLine();
+		ImGui::RadioButton(_tagName.c_str(), texNum, i);
+		j++;
+	}
+}
+//#endif
+
+void IF::Texture::GUIInit()
+{
+	folder = LoadTexture("folder.png");
 }
 
 void IF::Texture::setTexture(ID3D12GraphicsCommandList* commandList, unsigned short texHandle)

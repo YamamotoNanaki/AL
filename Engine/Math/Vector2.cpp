@@ -44,7 +44,7 @@ Vector2 Vector2::operator+() const
 
 Vector2 Vector2::operator-() const
 {
-	return *this;
+	return Vector2(-x, -y);
 }
 
 Vector2& Vector2::operator+=(const Vector2& v)
